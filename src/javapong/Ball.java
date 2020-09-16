@@ -18,8 +18,20 @@ public class Ball {
     public Ball() {
         x = 350;
         y = 250;
-        xVel = -1;
-        yVel = 1;
+        xVel = getRandomSpeed() * getRandomDirection();
+        yVel = getRandomSpeed() * getRandomDirection();
+    }
+    
+    public double getRandomSpeed() {
+        return (Math.random() * 3 + 2);
+    }
+    
+    public int getRandomDirection() {
+        int rand = (int)(Math.random() * 2);
+        if (rand == 1)
+            return 1;
+        else
+            return -1;
     }
     
     public void draw(Graphics g) {
