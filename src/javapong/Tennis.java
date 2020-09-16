@@ -17,18 +17,22 @@ public class Tennis extends Applet implements Runnable, KeyListener {
     Thread thread;
     HumanPaddle p1;
     AIPaddle p2;
+    HumanPaddle p3;
     Ball b1;
-    boolean startGame;
+    boolean computerMode;
+    boolean player2Mode;
     Graphics gfx;
     Image img;
     
     public void init() {
         this.resize(WIDTH, HEIGHT);
-        startGame = false;
+        computerMode = false;
+        player2Mode = false;
         this.addKeyListener(this);
         p1 = new HumanPaddle(1);
         b1 = new Ball();
         p2 = new AIPaddle(2, b1);
+        p3 = new HumanPaddle(2);
         img = createImage(WIDTH, HEIGHT); //creates an image of the applet
         gfx = img.getGraphics(); //takes the graphics of the image so that the drawing doesn't cause the applet to "flicker"; gfx paints offscreen
         thread = new Thread(this);
@@ -44,12 +48,16 @@ public class Tennis extends Applet implements Runnable, KeyListener {
         } else {
             p1.draw(gfx);
             b1.draw(gfx);
-            p2.draw(gfx);
+            if (computerMode)
+                p2.draw(gfx);
+            else if(player2Mode)
+                p3.draw(gfx);
         }
-        if (!startGame) {
+        if (!computerMode && !player2Mode) {
             gfx.setColor(Color.white);
-            gfx.drawString("Java Pong", 340, 100);
-            gfx.drawString("Press Enter to Start!", 310, 130);
+            gfx.drawString("Java Pong", 310, 100);
+            gfx.drawString("Press 7 for Vs. Computer", 280, 130);
+            gfx.drawString("Press 8 for 2 Player", 280, 160);
         }
         g.drawImage(img, 0, 0, this); //draws offscreen img to onscreen g
     }
@@ -60,11 +68,17 @@ public class Tennis extends Applet implements Runnable, KeyListener {
     
     public void run() { //keeps the game running
         while(true) {
-            if (startGame) {
+            if (computerMode || player2Mode) {
                 p1.move();
-                p2.move();
+                if(computerMode)
+                    p2.move();
+                else if(player2Mode)
+                    p3.move();
                 b1.move();
-                b1.checkPaddleCollision(p1, p2);
+                if(computerMode)
+                    b1.checkPaddleCollision(p1, p2);
+                else if(player2Mode)
+                    b1.checkPaddleCollision(p1, p3);
             }
             repaint();
             try {
@@ -86,24 +100,39 @@ public class Tennis extends Applet implements Runnable, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_UP) {
+        if(e.getKeyCode() == KeyEvent.VK_W) {
             p1.setUpAccel(true);
         }
-        else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+        else if (e.getKeyCode() == KeyEvent.VK_S) {
             p1.setDownAccel(true);
         }
-        else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            startGame = true;
+        else if (e.getKeyCode() == KeyEvent.VK_UP) {
+            p3.setUpAccel(true);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            p3.setDownAccel(true);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_7) {
+            computerMode = true;
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_8) {
+            player2Mode = true;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_UP) {
+        if(e.getKeyCode() == KeyEvent.VK_W) {
             p1.setUpAccel(false);
         }
-        else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+        else if (e.getKeyCode() == KeyEvent.VK_S) {
             p1.setDownAccel(false);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_UP) {
+            p3.setUpAccel(false);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            p3.setDownAccel(false);
         }
     }
 }
